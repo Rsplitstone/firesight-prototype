@@ -27,6 +27,7 @@
             margin-right: 0.75rem;
             width: 1.25rem;
             height: 1.25rem;
+            flex-shrink: 0; /* Prevent icons from shrinking */
         }
         .content-section {
             display: none;
@@ -63,7 +64,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             padding: 1.5rem;
         }
-        /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -92,62 +92,107 @@
             background-color: #6b7280; /* Gray-500 */
         }
         #zipCodeFilterSection {
-            /* Styles for the zip code filter area */
             padding: 1rem;
-            background-color: #e0f2fe; /* Sky-100 for a little highlight */
+            background-color: #e0f2fe; 
             border-radius: 0.5rem;
         }
 
+        /* Sidebar Collapsing Styles */
+        #sidebar {
+            /* Default width is w-64 (16rem) via Tailwind */
+            /* Transitions are handled by Tailwind `transition-all duration-300 ease-in-out` on the element */
+        }
+        #sidebar.minimized {
+            width: 5rem; /* Tailwind w-20 */
+        }
+        
+        #sidebarTitle, .sidebar-link-text, #sidebarFooter > p {
+            opacity: 1;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        #sidebar.minimized #sidebarTitle,
+        #sidebar.minimized .sidebar-link-text,
+        #sidebar.minimized #sidebarFooter > p { /* Target direct p children for footer */
+            opacity: 0;
+            pointer-events: none; /* Prevent interaction with hidden text */
+            width: 0; /* Collapse width to prevent layout shifts */
+            display: none; /* More robust hiding */
+        }
+        
+        #sidebar.minimized #sidebarNav .sidebar-link {
+            justify-content: center;
+        }
+        #sidebar.minimized #sidebarNav .sidebar-link svg {
+            margin-right: 0;
+        }
+
+        /* Ensure text fades in after panel expands */
+        #sidebar:not(.minimized) #sidebarTitle,
+        #sidebar:not(.minimized) .sidebar-link-text,
+        #sidebar:not(.minimized) #sidebarFooter > p {
+            transition-delay: 0.1s; /* Delay appearance of text */
+        }
     </style>
 </head>
 <body class="flex h-screen antialiased text-gray-800">
-    <aside class="w-64 bg-white p-4 space-y-2 border-r border-gray-200 flex flex-col">
-        <div class="flex items-center space-x-2 px-2 py-3 mb-4">
-            <svg class="w-8 h-8 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            <h1 class="text-2xl font-bold text-gray-700">FireSight AI</h1>
+    <aside id="sidebar" class="w-64 bg-white p-4 border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-2 overflow-hidden min-w-0"> {/* Added min-w-0 for flex child */}
+                <svg class="w-8 h-8 text-sky-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <h1 id="sidebarTitle" class="text-2xl font-bold text-gray-700 whitespace-nowrap">FireSight AI</h1>
+            </div>
+            <button id="sidebarToggleBtn" title="Collapse Sidebar" class="p-1 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-300">
+                <svg id="toggleIcon" class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    {/* Initial Icon: Chevron Double Left (Collapse) */}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
+                </svg>
+            </button>
         </div>
-        <nav class="flex-grow overflow-y-auto">
+
+        <nav id="sidebarNav" class="flex-grow overflow-y-auto overflow-x-hidden space-y-2">
             <a href="#" class="sidebar-link active" data-target="dashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
-                Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25A2.25 2.25 0 0113.5 8.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Dashboard</span>
             </a>
             <a href="#" class="sidebar-link" data-target="detection">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
-                Early Detection
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Early Detection</span>
             </a>
             <a href="#" class="sidebar-link" data-target="prediction">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
-                Prediction Modeling
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Prediction Modeling</span>
             </a>
             <a href="#" class="sidebar-link" data-target="situational-awareness">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                Situational Awareness
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Situational Awareness</span>
             </a>
             <a href="#" class="sidebar-link" data-target="resource-allocation">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.03 1.123 0 1.131.094 1.976 1.057 1.976 2.192V7.5M8.25 7.5h7.5M8.25 7.5V15M15.75 7.5V15M8.25 15h7.5M3 12h18M3 12c0-1.078.042-2.137.124-3.162a4.505 4.505 0 013.458-3.458C7.637 5.282 8.696 5.25 9.774 5.25h4.452c1.078 0 2.137.032 3.162.124a4.505 4.505 0 013.458 3.458C20.958 9.863 21 10.922 21 12M3 12c0 1.078-.042 2.137-.124 3.162a4.505 4.505 0 003.458 3.458C7.637 18.718 8.696 18.75 9.774 18.75h4.452c1.078 0 2.137-.032 3.162-.124a4.505 4.505 0 003.458-3.458C20.958 14.137 21 13.078 21 12z" /></svg>
-                Resource Allocation
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.03 1.123 0 1.131.094 1.976 1.057 1.976 2.192V7.5M8.25 7.5h7.5M8.25 7.5V15M15.75 7.5V15M8.25 15h7.5M3 12h18M3 12c0-1.078.042-2.137.124-3.162a4.505 4.505 0 013.458-3.458C7.637 5.282 8.696 5.25 9.774 5.25h4.452c1.078 0 2.137.032 3.162.124a4.505 4.505 0 013.458 3.458C20.958 9.863 21 10.922 21 12M3 12c0 1.078-.042 2.137-.124 3.162a4.505 4.505 0 003.458 3.458C7.637 18.718 8.696 18.75 9.774 18.75h4.452c1.078 0 2.137-.032 3.162-.124a4.505 4.505 0 003.458-3.458C20.958 14.137 21 13.078 21 12z" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Resource Allocation</span>
             </a>
             <a href="#" class="sidebar-link" data-target="evacuation-planning">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.5-11.25l-3.75 3.75M10.5 6H21M4.5 6H8.25m0 0l-3.75 3.75M4.5 15.75l3.75-3.75M4.5 15.75H21" /></svg>
-                Evacuation Planning
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.5-11.25l-3.75 3.75M10.5 6H21M4.5 6H8.25m0 0l-3.75 3.75M4.5 15.75l3.75-3.75M4.5 15.75H21" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Evacuation Planning</span>
             </a>
              <a href="#" class="sidebar-link" data-target="utility-monitoring">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
-                Utility Monitoring
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Utility Monitoring</span>
             </a>
             <a href="#" class="sidebar-link" data-target="public-communication">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-6.75 3h9m-9 3h9M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5M3.75 19.5h16.5" /></svg>
-                Public Communication
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-6.75 3h9m-9 3h9M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5M3.75 19.5h16.5" /></svg>
+                <span class="sidebar-link-text whitespace-nowrap">Public Communication</span>
             </a>
         </nav>
-        <div class="mt-auto p-2 text-xs text-gray-500">
-            <p>&copy; 2025 FireSight AI</p>
-            <p>System Status: <span class="text-green-500 font-semibold">Nominal</span></p>
-            <p>Last Refresh: <span id="lastRefreshTime">Just now</span></p>
+
+        <div id="sidebarFooter" class="mt-auto p-2 text-xs text-gray-500 overflow-hidden">
+            <p class="whitespace-nowrap">&copy; 2025 FireSight AI</p>
+            <p class="whitespace-nowrap">System Status: <span class="text-green-500 font-semibold">Nominal</span></p>
+            <p class="whitespace-nowrap">Last Refresh: <span id="lastRefreshTime">Just now</span></p>
         </div>
     </aside>
 
-    <main class="flex-1 p-6 overflow-y-auto">
+    <main id="mainContent" class="flex-1 p-6 overflow-y-auto transition-all duration-300 ease-in-out">
         <section id="dashboard" class="content-section active">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Dashboard Overview</h2>
 
@@ -334,6 +379,10 @@
 
     <script>
         // --- Global Variables and Data ---
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const toggleIcon = document.getElementById('toggleIcon'); // The SVG element for the toggle button's icon
+
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
         const contentSections = document.querySelectorAll('.content-section');
         const lastRefreshTimeElement = document.getElementById('lastRefreshTime');
@@ -348,12 +397,13 @@
         const currentFilterTextElement = document.getElementById('currentFilterText');
         const detectionCurrentFilterTextElement = document.getElementById('detectionCurrentFilterText');
 
+        let currentZipFilter = ''; 
 
-        let currentZipFilter = ''; // Stores the currently active zip code filter
+        // SVG Icon Paths
+        const chevronDoubleLeftPath = "M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"; // Collapse
+        const chevronDoubleRightPath = "M5.25 4.5l7.5 7.5-7.5 7.5m6-15l7.5 7.5-7.5 7.5"; // Expand
 
-        // Mock alert data with zip codes
-        // status can be 'new', 'acknowledged'
-        // type can be 'critical', 'warning', 'info', 'utility'
+
         let alertsData = [
             { id: 'INC00123', title: 'Critical: New Ignition Detected', source: 'Pano AI Camera PTZ-04B', location: 'Oak Ridge Sector 3', time: '13:32:15 PM', type: 'critical', status: 'new', zipCode: '92037' },
             { id: 'ALT00567', title: 'Warning: Elevated Smoke Levels', source: 'Dryad IoT Sensor DS-112', location: 'Redwood National Park, Area 7', time: '13:15:40 PM', type: 'warning', status: 'new', zipCode: '95501' },
@@ -361,11 +411,10 @@
             { id: 'CHK00330', title: 'Routine Check: All Clear', source: 'ALERTWildfire Camera C-GRIF-001', location: 'Griffith Peak', time: '11:30:00 PM', type: 'info', status: 'acknowledged', zipCode: '90027' },
             { id: 'UTIL0012', title: 'Utility: Line Fault Detected', source: 'Gridware Sensor GW-L003', location: 'Feeder Line FL-117B', time: '10:05:00 AM', type: 'utility', status: 'new', zipCode: '92037' },
             { id: 'INC00124', title: 'Critical: Structure Fire Reported', source: '911 Call Center', location: '123 Pine St', time: '14:05:00 PM', type: 'critical', status: 'new', zipCode: '92101' },
-            { id: 'WARN0025', title: 'Warning: Red Flag Conditions', source: 'National Weather Service', location: 'County Wide', time: '09:00:00 AM', type: 'warning', status: 'new', zipCode: '92037' }, // Example for a broader area
+            { id: 'WARN0025', title: 'Warning: Red Flag Conditions', source: 'National Weather Service', location: 'County Wide', time: '09:00:00 AM', type: 'warning', status: 'new', zipCode: '92037' }, 
         ];
 
         // --- Core Functions ---
-
         function updateLastRefreshTime() {
             const now = new Date();
             if (lastRefreshTimeElement) {
@@ -494,17 +543,16 @@
         
         function handleUpdateZipCode() {
             const newZip = zipCodeInputElement.value.trim();
-            // Basic validation for a 5-digit zip code
             if (/^\d{5}$/.test(newZip)) {
                 currentZipFilter = newZip;
-            } else if (newZip === "") { // Allow clearing the filter by submitting empty
+            } else if (newZip === "") { 
                 currentZipFilter = "";
             }
             else {
                 alert("Please enter a valid 5-digit Zip Code.");
                 return;
             }
-            zipCodeInputElement.value = currentZipFilter; // Update input field to reflect stored filter (or clear it)
+            zipCodeInputElement.value = currentZipFilter; 
             renderAllAlertLists();
             updateActiveIncidentsCount();
             updateCurrentFilterDisplay();
@@ -520,8 +568,7 @@
 
         function renderAllAlertLists() {
             let sourceAlerts = alertsData;
-            // No pre-filtering here, renderAlerts will handle zip code filtering internally
-
+            
             const dashboardAlerts = [...sourceAlerts].sort((a,b) => {
                 return b.time.localeCompare(a.time); 
             }).slice(0, 4); 
@@ -537,17 +584,33 @@
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar Toggle Functionality
+            if (sidebarToggleBtn && sidebar && toggleIcon) {
+                sidebarToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+
+                    if (sidebar.classList.contains('minimized')) {
+                        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="${chevronDoubleRightPath}" />`;
+                        sidebarToggleBtn.setAttribute('title', 'Expand Sidebar');
+                    } else {
+                        toggleIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="${chevronDoubleLeftPath}" />`;
+                        sidebarToggleBtn.setAttribute('title', 'Collapse Sidebar');
+                    }
+                });
+            }
+
+            // Existing sidebar navigation
             sidebarLinks.forEach(link => {
                 link.addEventListener('click', handleSidebarLinkClick);
             });
 
+            // Zip Code Filter Functionality
             if (updateZipCodeButton) {
                 updateZipCodeButton.addEventListener('click', handleUpdateZipCode);
             }
             if (clearZipCodeButton) {
                 clearZipCodeButton.addEventListener('click', handleClearZipCode);
             }
-            // Allow Enter key to submit zip code
             if (zipCodeInputElement) {
                 zipCodeInputElement.addEventListener('keypress', function(event) {
                     if (event.key === 'Enter') {
@@ -556,7 +619,7 @@
                 });
             }
 
-
+            // Initial setup
             updateLastRefreshTime();
             setInterval(updateLastRefreshTime, 60000); 
 
