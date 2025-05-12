@@ -79,6 +79,25 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; /* Slate-400 */
         }
+        .alert-acknowledged {
+            opacity: 0.7;
+            border-left-width: 4px;
+            border-left-color: #22c55e; /* Green-500 */
+        }
+        .alert-acknowledged .acknowledge-button {
+            background-color: #6b7280; /* Gray-500 */
+            cursor: not-allowed;
+        }
+         .alert-acknowledged .acknowledge-button:hover {
+            background-color: #6b7280; /* Gray-500 */
+        }
+        #zipCodeFilterSection {
+            /* Styles for the zip code filter area */
+            padding: 1rem;
+            background-color: #e0f2fe; /* Sky-100 for a little highlight */
+            border-radius: 0.5rem;
+        }
+
     </style>
 </head>
 <body class="flex h-screen antialiased text-gray-800">
@@ -131,11 +150,47 @@
     <main class="flex-1 p-6 overflow-y-auto">
         <section id="dashboard" class="content-section active">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Dashboard Overview</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+
+            <div id="zipCodeFilterSection" class="card mb-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Filter Alerts by Zip Code</h3>
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="zipCodeInput" placeholder="Enter 5-digit Zip Code" class="mt-1 block w-full md:w-1/3 rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm p-2">
+                    <button id="updateZipCodeButton" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-md text-sm">Update Alerts</button>
+                    <button id="clearZipCodeButton" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-md text-sm">Clear Filter</button>
+                </div>
+                <p id="currentFilterText" class="text-xs text-gray-600 mt-2 italic"></p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 card order-1 lg:order-1">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Alerts</h3>
+                    <div id="dashboardRecentAlerts" class="space-y-4 max-h-[450px] overflow-y-auto">
+                        <p class="text-gray-500">Loading alerts...</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1 card order-2 lg:order-2">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Regional Overview Map</h3>
+                    <div class="map-placeholder h-96 relative">
+                        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+                            <path d="M50 50 Q100 20 150 50 T250 50 T350 50 L350 250 Q300 280 250 250 T150 250 T50 250 Z" fill="#a7f3d0" stroke="#059669" stroke-width="1"/>
+                            <path d="M80 80 Q120 60 160 90 T230 70 L260 120 L200 150 L100 130 Z" fill="#bae6fd" stroke="#0284c7" stroke-width="1"/>
+                            <circle cx="180" cy="120" r="5" fill="red" />
+                            <text x="188" y="124" font-size="10" fill="black">Incident Alpha</text>
+                            <circle cx="250" cy="180" r="5" fill="orange" />
+                            <text x="258" y="184" font-size="10" fill="black">Zone Bravo (High Risk)</text>
+                            <rect x="10" y="10" width="380" height="280" fill="none" stroke="#9ca3af" stroke-width="1" rx="5" />
+                        </svg>
+                        <div class="blinking-dot" style="left: 45%; top: 40%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6 order-3">
                 <div class="card">
                     <h3 class="text-lg font-medium text-gray-600">Active Incidents</h3>
-                    <p class="text-4xl font-bold text-red-600">3</p>
-                    <p class="text-sm text-gray-500 mt-1">+1 since last hour</p>
+                    <p class="text-4xl font-bold text-red-600" id="activeIncidentsCount">0</p>
+                    <p class="text-sm text-gray-500 mt-1">Based on critical alerts</p>
                 </div>
                 <div class="card">
                     <h3 class="text-lg font-medium text-gray-600">High-Risk Zones</h3>
@@ -153,53 +208,12 @@
                     <p class="text-sm text-gray-500 mt-1">AI Model v2.3</p>
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 card">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Regional Overview Map</h3>
-                    <div class="map-placeholder h-96 relative">
-                        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
-                            <path d="M50 50 Q100 20 150 50 T250 50 T350 50 L350 250 Q300 280 250 250 T150 250 T50 250 Z" fill="#a7f3d0" stroke="#059669" stroke-width="1"/>
-                            <path d="M80 80 Q120 60 160 90 T230 70 L260 120 L200 150 L100 130 Z" fill="#bae6fd" stroke="#0284c7" stroke-width="1"/>
-                            <circle cx="180" cy="120" r="5" fill="red" />
-                            <text x="188" y="124" font-size="10" fill="black">Incident Alpha</text>
-                            <circle cx="250" cy="180" r="5" fill="orange" />
-                            <text x="258" y="184" font-size="10" fill="black">Zone Bravo (High Risk)</text>
-                            <rect x="10" y="10" width="380" height="280" fill="none" stroke="#9ca3af" stroke-width="1" rx="5" />
-                        </svg>
-                         <div class="blinking-dot" style="left: 45%; top: 40%;"></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Alerts</h3>
-                    <div class="space-y-4 max-h-96 overflow-y-auto">
-                        <div class="p-3 bg-red-50 border border-red-200 rounded-md">
-                            <p class="font-semibold text-red-700">Critical: New Ignition Detected</p>
-                            <p class="text-sm text-gray-600">Location: Oak Ridge Sector 3</p>
-                            <p class="text-xs text-gray-500">Time: 13:35 PM</p>
-                        </div>
-                        <div class="p-3 bg-orange-50 border border-orange-200 rounded-md">
-                            <p class="font-semibold text-orange-700">Warning: High Fire Risk</p>
-                            <p class="text-sm text-gray-600">Area: Pine Valley</p>
-                            <p class="text-xs text-gray-500">Forecast: Strong Winds</p>
-                        </div>
-                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                            <p class="font-semibold text-yellow-700">Info: Sensor Anomaly</p>
-                            <p class="text-sm text-gray-600">Sensor ID: CAM-07B</p>
-                            <p class="text-xs text-gray-500">Status: Offline, investigating</p>
-                        </div>
-                         <div class="p-3 bg-sky-50 border border-sky-200 rounded-md">
-                            <p class="font-semibold text-sky-700">Update: Utility Line Check</p>
-                            <p class="text-sm text-gray-600">Line ID: UL-451</p>
-                            <p class="text-xs text-gray-500">Status: Cleared, no issue</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section id="detection" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Multi-Modal Early Detection</h2>
+            <p id="detectionCurrentFilterText" class="text-sm text-gray-700 mb-4"></p>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card">
                     <h3 class="text-xl font-semibold text-gray-700 mb-4">Detection Map</h3>
@@ -212,61 +226,24 @@
                             <text x="210" y="100" font-size="10">Zone B</text>
                             <polygon points="100,180 250,160 300,250 150,280" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
                             <text x="120" y="200" font-size="10">Zone C</text>
-
-                            <circle cx="80" cy="60" r="6" fill="#4ade80" stroke="black" stroke-width="0.5"/> <text x="85" y="63" font-size="8">CAM1</text>
-                            <rect x="220" y="90" width="10" height="10" fill="#fb923c" stroke="black" stroke-width="0.5"/> <text x="232" y="98" font-size="8">IoT3</text>
-                            <polygon points="150,200 155,190 160,200" fill="#f472b6" stroke="black" stroke-width="0.5"/> <text x="162" y="198" font-size="8">SAT2</text>
-
+                            <circle cx="80" cy="60" r="6" fill="#4ade80" stroke="black" stroke-width="0.5"/>
+                            <text x="85" y="63" font-size="8">CAM1</text>
+                            <rect x="220" y="90" width="10" height="10" fill="#fb923c" stroke="black" stroke-width="0.5"/>
+                            <text x="232" y="98" font-size="8">IoT3</text>
+                            <polygon points="150,200 155,190 160,200" fill="#f472b6" stroke="black" stroke-width="0.5"/>
+                            <text x="162" y="198" font-size="8">SAT2</text>
                             <circle cx="250" cy="130" r="8" fill="red" />
                             <path d="M245,125 L255,135 M255,125 L245,135" stroke="white" stroke-width="2"/>
                             <text x="260" y="133" font-size="10" fill="red" font-weight="bold">IGNITION!</text>
                             <rect x="1" y="1" width="398" height="298" fill="none" stroke="#9ca3af" stroke-width="1" rx="5" />
                         </svg>
-                        <div class="blinking-dot" style="left: 62.5%; top: 43.3%;"></div> </div>
+                        <div class="blinking-dot" style="left: 62.5%; top: 43.3%;"></div>
+                    </div>
                 </div>
                 <div class="card">
                     <h3 class="text-xl font-semibold text-gray-700 mb-4">Active Alerts Feed</h3>
-                    <div class="space-y-3 max-h-[500px] overflow-y-auto">
-                        <div class="border p-3 rounded-md shadow-sm bg-red-50 border-red-300">
-                            <div class="flex justify-between items-center">
-                                <span class="font-semibold text-red-700">Critical Ignition</span>
-                                <span class="text-xs text-red-500">ID: #INC00123</span>
-                            </div>
-                            <p class="text-sm text-gray-700">Source: Pano AI Camera PTZ-04B</p>
-                            <p class="text-sm text-gray-700">Location: 34.0522° N, 118.2437° W (Oak Canyon)</p>
-                            <p class="text-xs text-gray-500">Timestamp: May 12, 2025, 13:32:15 PM</p>
-                            <button class="mt-2 text-xs bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded">View Details</button>
-                        </div>
-                        <div class="border p-3 rounded-md shadow-sm bg-orange-50 border-orange-300">
-                            <div class="flex justify-between items-center">
-                                <span class="font-semibold text-orange-700">Elevated Smoke Levels</span>
-                                <span class="text-xs text-orange-500">ID: #ALT00567</span>
-                            </div>
-                            <p class="text-sm text-gray-700">Source: Dryad IoT Sensor DS-112</p>
-                            <p class="text-sm text-gray-700">Location: Redwood National Park, Area 7</p>
-                            <p class="text-xs text-gray-500">Timestamp: May 12, 2025, 13:15:40 PM</p>
-                            <button class="mt-2 text-xs bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded">Acknowledge</button>
-                        </div>
-                        <div class="border p-3 rounded-md shadow-sm bg-yellow-50 border-yellow-300">
-                             <div class="flex justify-between items-center">
-                                <span class="font-semibold text-yellow-700">Thermal Anomaly</span>
-                                <span class="text-xs text-yellow-500">ID: #ALT00568</span>
-                            </div>
-                            <p class="text-sm text-gray-700">Source: OroraTech Satellite Pass</p>
-                            <p class="text-sm text-gray-700">Location: Grid Ref 45B.2</p>
-                            <p class="text-xs text-gray-500">Timestamp: May 12, 2025, 12:55:00 PM</p>
-                            <button class="mt-2 text-xs bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded">Investigate</button>
-                        </div>
-                         <div class="border p-3 rounded-md shadow-sm bg-sky-50 border-sky-300">
-                             <div class="flex justify-between items-center">
-                                <span class="font-semibold text-sky-700">Routine Check</span>
-                                <span class="text-xs text-sky-500">ID: #CHK00330</span>
-                            </div>
-                            <p class="text-sm text-gray-700">Source: ALERTWildfire Camera C-GRIF-001</p>
-                            <p class="text-sm text-gray-700">Location: Griffith Peak</p>
-                            <p class="text-xs text-gray-500">Timestamp: May 12, 2025, 11:30:00 PM</p>
-                             <p class="text-xs text-green-600 font-medium mt-1">Status: All Clear</p>
-                        </div>
+                    <div id="detectionActiveAlertsFeed" class="space-y-3 max-h-[500px] overflow-y-auto">
+                         <p class="text-gray-500">Loading alerts...</p>
                     </div>
                 </div>
             </div>
@@ -278,28 +255,26 @@
                 <div class="lg:col-span-2 card">
                     <h3 class="text-xl font-semibold text-gray-700 mb-4">Fire Spread Prediction Map (Incident #INC00123)</h3>
                     <div class="map-placeholder h-[450px] relative">
-                         <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+                        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
                             <defs>
                                 <filter id="blurFilter" x="-20%" y="-20%" width="140%" height="140%">
                                     <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
                                 </filter>
                             </defs>
                             <rect x="0" y="0" width="400" height="300" fill="#f3f4f6" />
-                            <path d="M0 200 Q50 150 100 180 T200 150 T300 180 T400 150 V300 H0 Z" fill="#d4d4d8" /> <path d="M50 50 Q100 20 150 50 T250 50 T350 50 L350 150 Q300 180 250 150 T150 150 T50 150 Z" fill="#a3e635" /> <ellipse cx="150" cy="100" rx="30" ry="20" fill="rgba(255,0,0,0.6)" stroke="darkred" stroke-width="1.5"/>
+                            <path d="M0 200 Q50 150 100 180 T200 150 T300 180 T400 150 V300 H0 Z" fill="#d4d4d8" />
+                            <path d="M50 50 Q100 20 150 50 T250 50 T350 50 L350 150 Q300 180 250 150 T150 150 T50 150 Z" fill="#a3e635" />
+                            <ellipse cx="150" cy="100" rx="30" ry="20" fill="rgba(255,0,0,0.6)" stroke="darkred" stroke-width="1.5"/>
                             <text x="130" y="105" font-size="10" fill="white" font-weight="bold">Current</text>
-
                             <ellipse cx="160" cy="105" rx="45" ry="30" fill="rgba(255,100,0,0.4)" filter="url(#blurFilter)"/>
                             <ellipse cx="160" cy="105" rx="45" ry="30" fill="none" stroke="orange" stroke-width="1" stroke-dasharray="4 2"/>
                             <text x="195" y="80" font-size="9" fill="darkorange">1 hr</text>
-
                             <ellipse cx="175" cy="115" rx="65" ry="45" fill="rgba(255,165,0,0.3)" filter="url(#blurFilter)"/>
                             <ellipse cx="175" cy="115" rx="65" ry="45" fill="none" stroke="orangered" stroke-width="1" stroke-dasharray="4 2"/>
                             <text x="225" y="75" font-size="9" fill="red">3 hr</text>
-
-                             <ellipse cx="195" cy="125" rx="90" ry="65" fill="rgba(255,200,0,0.2)" filter="url(#blurFilter)"/>
+                            <ellipse cx="195" cy="125" rx="90" ry="65" fill="rgba(255,200,0,0.2)" filter="url(#blurFilter)"/>
                             <ellipse cx="195" cy="125" rx="90" ry="65" fill="none" stroke="#b91c1c" stroke-width="1" stroke-dasharray="4 2"/>
                             <text x="270" y="70" font-size="9" fill="#7f1d1d">6 hr</text>
-
                             <rect x="1" y="1" width="398" height="298" fill="none" stroke="#9ca3af" stroke-width="1" rx="5" />
                         </svg>
                     </div>
@@ -337,153 +312,257 @@
 
         <section id="situational-awareness" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Situational Awareness</h2>
-            <div class="card">
-                <p class="text-gray-600">This section will provide a comprehensive, real-time operational view, integrating diverse data streams (visual, thermal, weather, sensor data, emergency calls) for fire managers.</p>
-                <div class="mt-4 p-4 bg-sky-50 border-sky-200 rounded-md text-sky-700">
-                    Feature under development. Key elements will include:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li>Aggregated sensor status</li>
-                        <li>Live weather overlays</li>
-                        <li>Resource deployment locations</li>
-                        <li>Emergency call heatmaps</li>
-                    </ul>
-                </div>
-            </div>
+            <div class="card"><p>Feature under development...</p></div>
         </section>
-
         <section id="resource-allocation" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Dynamic Resource Allocation</h2>
-             <div class="card">
-                <p class="text-gray-600">This module will provide data-driven recommendations for deploying firefighting personnel, equipment, and aerial assets using reinforcement learning algorithms.</p>
-                <div class="mt-4 p-4 bg-sky-50 border-sky-200 rounded-md text-sky-700">
-                    Feature under development. Key elements will include:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li>Optimized asset placement suggestions</li>
-                        <li>Real-time tracking of resource availability</li>
-                        <li>Prioritization based on predicted fire behavior and asset protection</li>
-                    </ul>
-                </div>
-            </div>
+             <div class="card"><p>Feature under development...</p></div>
         </section>
-
         <section id="evacuation-planning" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Evacuation Route Optimization</h2>
-            <div class="card">
-                <p class="text-gray-600">This section will assist emergency managers in planning and dynamically adjusting evacuation routes based on real-time fire progression, traffic, and population density.</p>
-                <div class="mt-4 p-4 bg-sky-50 border-sky-200 rounded-md text-sky-700">
-                    Feature under development. Key elements will include:
-                    <ul class="list-disc list-inside ml-4 mt-2">
-                        <li>Dynamic route generation</li>
-                        <li>Traffic condition integration</li>
-                        <li>Shelter capacity information</li>
-                        <li>Vulnerable population identification</li>
-                    </ul>
-                </div>
-            </div>
+            <div class="card"><p>Feature under development...</p></div>
         </section>
-
         <section id="utility-monitoring" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Preventative Utility Infrastructure Monitoring</h2>
-            <div class="card">
-                <p class="text-gray-600">This module integrates data from grid monitoring systems (e.g., Gridware) to help utilities identify potential equipment failures or dangerous conditions before they cause ignitions.</p>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 border rounded-lg bg-white">
-                        <h4 class="font-semibold text-lg text-green-600">Substation Alpha-03</h4>
-                        <p class="text-sm text-gray-500">Status: Nominal</p>
-                        <p class="text-xs">Transformer Temp: 55°C</p>
-                        <p class="text-xs">Line Sag: Normal</p>
-                    </div>
-                    <div class="p-4 border rounded-lg bg-yellow-50 border-yellow-400">
-                        <h4 class="font-semibold text-lg text-yellow-700">Feeder Line FL-117B</h4>
-                        <p class="text-sm text-gray-500">Status: Warning</p>
-                        <p class="text-xs">Fault Current Detected: 0.2A spike</p>
-                        <p class="text-xs">Vegetation Clearance: Borderline</p>
-                        <button class="mt-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded">Dispatch Crew</button>
-                    </div>
-                     <div class="p-4 border rounded-lg bg-red-50 border-red-400">
-                        <h4 class="font-semibold text-lg text-red-700">Pole #P7822-C</h4>
-                        <p class="text-sm text-gray-500">Status: Critical</p>
-                        <p class="text-xs">Equipment: Recloser R-98</p>
-                        <p class="text-xs">Issue: High temperature alarm (95°C)</p>
-                        <button class="mt-1 text-xs bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded">Immediate De-energize</button>
-                    </div>
-                     <div class="p-4 border rounded-lg bg-white">
-                        <h4 class="font-semibold text-lg text-green-600">Transmission Line TL-04</h4>
-                        <p class="text-sm text-gray-500">Status: Nominal</p>
-                        <p class="text-xs">Last Inspection: 2025-05-10</p>
-                        <p class="text-xs">Weather Conditions: Clear</p>
-                    </div>
-                </div>
-                 <div class="mt-4 p-4 bg-sky-50 border-sky-200 rounded-md text-sky-700">
-                    Further development will include GIS integration for asset locations and predictive failure analysis.
-                </div>
-            </div>
+            <div class="card"><p>Feature under development...</p></div>
         </section>
-
         <section id="public-communication" class="content-section">
             <h2 class="text-3xl font-semibold text-gray-800 mb-6">Automated Public Communication</h2>
-            <div class="card">
-                <p class="text-gray-600">This system will facilitate timely, accurate dissemination of warnings, alerts, and critical information to affected communities.</p>
-                <div class="mt-4">
-                    <h4 class="font-semibold text-lg mb-2">Recent Communications Sent:</h4>
-                    <div class="space-y-3 max-h-80 overflow-y-auto">
-                        <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                            <p class="font-semibold text-blue-700">Evacuation Warning: Oak Ridge Sector 3</p>
-                            <p class="text-sm text-gray-600">Channels: WEA, SMS, Social Media</p>
-                            <p class="text-xs text-gray-500">Time: May 12, 2025, 13:38 PM</p>
-                        </div>
-                        <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                            <p class="font-semibold text-gray-700">Informational: Smoke Advisory for Pine Valley</p>
-                            <p class="text-sm text-gray-600">Channels: Email Alert, Community Website</p>
-                            <p class="text-xs text-gray-500">Time: May 12, 2025, 13:20 PM</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-4 p-4 bg-sky-50 border-sky-200 rounded-md text-sky-700">
-                    Future enhancements: Customizable message templates, multi-language support, and feedback channels.
-                </div>
-            </div>
+            <div class="card"><p>Feature under development...</p></div>
         </section>
-
     </main>
 
     <script>
-        // JavaScript for sidebar navigation and dynamic content display
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarLinks = document.querySelectorAll('.sidebar-link');
-            const contentSections = document.querySelectorAll('.content-section');
-            const lastRefreshTimeElement = document.getElementById('lastRefreshTime');
+        // --- Global Variables and Data ---
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const lastRefreshTimeElement = document.getElementById('lastRefreshTime');
+        
+        const dashboardRecentAlertsContainer = document.getElementById('dashboardRecentAlerts');
+        const detectionActiveAlertsFeedContainer = document.getElementById('detectionActiveAlertsFeed');
+        const activeIncidentsCountElement = document.getElementById('activeIncidentsCount');
 
-            // Function to update last refresh time
-            function updateLastRefreshTime() {
-                const now = new Date();
+        const zipCodeInputElement = document.getElementById('zipCodeInput');
+        const updateZipCodeButton = document.getElementById('updateZipCodeButton');
+        const clearZipCodeButton = document.getElementById('clearZipCodeButton');
+        const currentFilterTextElement = document.getElementById('currentFilterText');
+        const detectionCurrentFilterTextElement = document.getElementById('detectionCurrentFilterText');
+
+
+        let currentZipFilter = ''; // Stores the currently active zip code filter
+
+        // Mock alert data with zip codes
+        // status can be 'new', 'acknowledged'
+        // type can be 'critical', 'warning', 'info', 'utility'
+        let alertsData = [
+            { id: 'INC00123', title: 'Critical: New Ignition Detected', source: 'Pano AI Camera PTZ-04B', location: 'Oak Ridge Sector 3', time: '13:32:15 PM', type: 'critical', status: 'new', zipCode: '92037' },
+            { id: 'ALT00567', title: 'Warning: Elevated Smoke Levels', source: 'Dryad IoT Sensor DS-112', location: 'Redwood National Park, Area 7', time: '13:15:40 PM', type: 'warning', status: 'new', zipCode: '95501' },
+            { id: 'ALT00568', title: 'Info: Thermal Anomaly', source: 'OroraTech Satellite Pass', location: 'Grid Ref 45B.2', time: '12:55:00 PM', type: 'info', status: 'acknowledged', zipCode: '92122' },
+            { id: 'CHK00330', title: 'Routine Check: All Clear', source: 'ALERTWildfire Camera C-GRIF-001', location: 'Griffith Peak', time: '11:30:00 PM', type: 'info', status: 'acknowledged', zipCode: '90027' },
+            { id: 'UTIL0012', title: 'Utility: Line Fault Detected', source: 'Gridware Sensor GW-L003', location: 'Feeder Line FL-117B', time: '10:05:00 AM', type: 'utility', status: 'new', zipCode: '92037' },
+            { id: 'INC00124', title: 'Critical: Structure Fire Reported', source: '911 Call Center', location: '123 Pine St', time: '14:05:00 PM', type: 'critical', status: 'new', zipCode: '92101' },
+            { id: 'WARN0025', title: 'Warning: Red Flag Conditions', source: 'National Weather Service', location: 'County Wide', time: '09:00:00 AM', type: 'warning', status: 'new', zipCode: '92037' }, // Example for a broader area
+        ];
+
+        // --- Core Functions ---
+
+        function updateLastRefreshTime() {
+            const now = new Date();
+            if (lastRefreshTimeElement) {
                 lastRefreshTimeElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
-            
-            // Set initial active section based on the 'active' class in HTML
-            // No need to click, dashboard is active by default
-            updateLastRefreshTime(); // Initial call
-            setInterval(updateLastRefreshTime, 60000); // Update every minute
+        }
 
+        function renderAlerts(container, alertsToRender, showAcknowledgeButton = true) {
+            if (!container) return;
+            container.innerHTML = ''; 
 
-            sidebarLinks.forEach(link => {
-                link.addEventListener('click', function (event) {
-                    event.preventDefault(); // Prevent default link behavior
+            let filteredAlerts = alertsToRender;
+            if (currentZipFilter) {
+                filteredAlerts = alertsToRender.filter(alert => alert.zipCode === currentZipFilter);
+            }
 
-                    // Remove 'active' class from all links and sections
-                    sidebarLinks.forEach(l => l.classList.remove('active'));
-                    contentSections.forEach(s => s.classList.remove('active'));
+            if (filteredAlerts.length === 0) {
+                let message = currentZipFilter ? `No alerts found for Zip Code: ${currentZipFilter}.` : 'No alerts to display.';
+                container.innerHTML = `<p class="text-gray-500 p-4">${message}</p>`;
+                return;
+            }
 
-                    // Add 'active' class to the clicked link and target section
-                    this.classList.add('active');
-                    const targetId = this.getAttribute('data-target');
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) {
-                        targetSection.classList.add('active');
-                    }
-                    updateLastRefreshTime(); // Update time on navigation
-                });
+            filteredAlerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `p-3 border rounded-md shadow-sm ${getAlertStyling(alert.type, alert.status)}`;
+                if (alert.status === 'acknowledged') {
+                    alertDiv.classList.add('alert-acknowledged');
+                }
+
+                let buttonHtml = '';
+                if (showAcknowledgeButton) {
+                     buttonHtml = `
+                        <button 
+                            class="acknowledge-button mt-2 text-xs ${alert.status === 'new' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-400 cursor-not-allowed'} text-white py-1 px-2 rounded" 
+                            data-alert-id="${alert.id}"
+                            ${alert.status === 'acknowledged' ? 'disabled' : ''}
+                        >
+                            ${alert.status === 'new' ? 'Acknowledge' : 'Acknowledged'}
+                        </button>`;
+                }
+
+                alertDiv.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold ${getAlertTextColor(alert.type)}">${alert.title}</span>
+                        <span class="text-xs ${getAlertTextColor(alert.type, true)}">ID: #${alert.id} (Zip: ${alert.zipCode})</span>
+                    </div>
+                    <p class="text-sm text-gray-700">Source: ${alert.source}</p>
+                    <p class="text-sm text-gray-700">Location: ${alert.location}</p>
+                    <p class="text-xs text-gray-500">Timestamp: ${new Date().toLocaleDateString()} ${alert.time}</p>
+                    ${buttonHtml}
+                `;
+                container.appendChild(alertDiv);
             });
+
+            if (showAcknowledgeButton) {
+                container.querySelectorAll('.acknowledge-button').forEach(button => {
+                    if (button.disabled) return;
+                    button.addEventListener('click', handleAcknowledgeAlert);
+                });
+            }
+        }
+
+        function getAlertStyling(type, status) {
+            if (status === 'acknowledged') return 'bg-green-50 border-green-300';
+            switch (type) {
+                case 'critical': return 'bg-red-50 border-red-300';
+                case 'warning': return 'bg-orange-50 border-orange-300';
+                case 'info': return 'bg-sky-50 border-sky-300';
+                case 'utility': return 'bg-yellow-50 border-yellow-300';
+                default: return 'bg-gray-50 border-gray-300';
+            }
+        }
+
+        function getAlertTextColor(type, isMuted = false) {
+            const mutedClass = isMuted ? '500' : '700';
+            switch (type) {
+                case 'critical': return `text-red-${mutedClass}`;
+                case 'warning': return `text-orange-${mutedClass}`;
+                case 'info': return `text-sky-${mutedClass}`;
+                case 'utility': return `text-yellow-${mutedClass}`;
+                default: return `text-gray-${mutedClass}`;
+            }
+        }
+        
+        function updateActiveIncidentsCount() {
+            if (activeIncidentsCountElement) {
+                let relevantAlerts = alertsData;
+                if (currentZipFilter) {
+                    relevantAlerts = alertsData.filter(alert => alert.zipCode === currentZipFilter);
+                }
+                const criticalNewAlerts = relevantAlerts.filter(alert => alert.type === 'critical' && alert.status === 'new').length;
+                activeIncidentsCountElement.textContent = criticalNewAlerts;
+            }
+        }
+
+        function updateCurrentFilterDisplay() {
+            const filterText = currentZipFilter ? `Showing alerts for Zip Code: ${currentZipFilter}` : 'Showing all alerts.';
+            if (currentFilterTextElement) currentFilterTextElement.textContent = filterText;
+            if (detectionCurrentFilterTextElement) detectionCurrentFilterTextElement.textContent = filterText;
+        }
+
+        // --- Event Handlers ---
+        function handleAcknowledgeAlert(event) {
+            const alertId = event.target.dataset.alertId;
+            const alertToAcknowledge = alertsData.find(a => a.id === alertId);
+
+            if (alertToAcknowledge && alertToAcknowledge.status === 'new') {
+                alertToAcknowledge.status = 'acknowledged';
+                renderAllAlertLists();
+                updateActiveIncidentsCount();
+            }
+        }
+
+        function handleSidebarLinkClick(event) {
+            event.preventDefault(); 
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            contentSections.forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+            const targetId = this.getAttribute('data-target');
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            updateLastRefreshTime();
+        }
+        
+        function handleUpdateZipCode() {
+            const newZip = zipCodeInputElement.value.trim();
+            // Basic validation for a 5-digit zip code
+            if (/^\d{5}$/.test(newZip)) {
+                currentZipFilter = newZip;
+            } else if (newZip === "") { // Allow clearing the filter by submitting empty
+                currentZipFilter = "";
+            }
+            else {
+                alert("Please enter a valid 5-digit Zip Code.");
+                return;
+            }
+            zipCodeInputElement.value = currentZipFilter; // Update input field to reflect stored filter (or clear it)
+            renderAllAlertLists();
+            updateActiveIncidentsCount();
+            updateCurrentFilterDisplay();
+        }
+
+        function handleClearZipCode() {
+            currentZipFilter = '';
+            zipCodeInputElement.value = '';
+            renderAllAlertLists();
+            updateActiveIncidentsCount();
+            updateCurrentFilterDisplay();
+        }
+
+        function renderAllAlertLists() {
+            let sourceAlerts = alertsData;
+            // No pre-filtering here, renderAlerts will handle zip code filtering internally
+
+            const dashboardAlerts = [...sourceAlerts].sort((a,b) => {
+                return b.time.localeCompare(a.time); 
+            }).slice(0, 4); 
+            renderAlerts(dashboardRecentAlertsContainer, dashboardAlerts, true);
+
+            const detectionAlerts = [...sourceAlerts].sort((a, b) => {
+                if (a.status === 'new' && b.status !== 'new') return -1;
+                if (a.status !== 'new' && b.status === 'new') return 1;
+                return b.time.localeCompare(a.time); 
+            });
+            renderAlerts(detectionActiveAlertsFeedContainer, detectionAlerts, true);
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', function () {
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', handleSidebarLinkClick);
+            });
+
+            if (updateZipCodeButton) {
+                updateZipCodeButton.addEventListener('click', handleUpdateZipCode);
+            }
+            if (clearZipCodeButton) {
+                clearZipCodeButton.addEventListener('click', handleClearZipCode);
+            }
+            // Allow Enter key to submit zip code
+            if (zipCodeInputElement) {
+                zipCodeInputElement.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handleUpdateZipCode();
+                    }
+                });
+            }
+
+
+            updateLastRefreshTime();
+            setInterval(updateLastRefreshTime, 60000); 
+
+            renderAllAlertLists();
+            updateActiveIncidentsCount();
+            updateCurrentFilterDisplay();
         });
     </script>
 </body>
