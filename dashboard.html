@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireSight Dashboard Demo</title>
+    <!-- React and Babel via CDN -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- Tailwind for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        #map { height: 300px; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useEffect, useRef, useState } = React;
+
+        // Sample alerts
+        const sampleAlerts = [
+            { id: 1, message: 'New ignition detected near Oak Ridge.', severity: 'critical' },
+            { id: 2, message: 'Smoke levels rising in Zone 3.', severity: 'warning' },
+            { id: 3, message: 'All clear in Zone 2.', severity: 'info' }
+        ];
+
+        function AlertsFeed() {
+            const alerts = sampleAlerts.map(a => (
+                <div key={a.id} className="border p-2 mb-1 rounded bg-white">
+                    <span className="font-semibold mr-2">[{a.severity}]</span>
+                    {a.message}
+                </div>
+            ));
+            return (
+                <div>
+                    <h2 className="text-lg font-bold mb-2">Live Alerts</h2>
+                    {alerts}
+                </div>
+            );
+        }
+
+        function MapPanel() {
+            const mapRef = useRef(null);
+            useEffect(() => {
+                if (!mapRef.current) return;
+                const map = L.map(mapRef.current).setView([37.77, -122.42], 9);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+                L.marker([37.77, -122.42]).addTo(map);
+            }, []);
+            return (
+                <div>
+                    <h2 className="text-lg font-bold mb-2">Map</h2>
+                    <div id="map" ref={mapRef} className="mb-2"></div>
+                </div>
+            );
+        }
+
+        function ChartPanel() {
+            const canvasRef = useRef(null);
+            useEffect(() => {
+                if (!canvasRef.current) return;
+                new Chart(canvasRef.current, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                        datasets: [
+                            { label: 'Temp', data: [20, 25, 22, 18], borderColor: 'red' },
+                            { label: 'Humidity', data: [50, 48, 45, 52], borderColor: 'blue' }
+                        ]
+                    }
+                });
+            }, []);
+            return (
+                <div>
+                    <h2 className="text-lg font-bold mb-2">Conditions</h2>
+                    <canvas ref={canvasRef}></canvas>
+                </div>
+            );
+        }
+
+        function PredictionPanel() {
+            return (
+                <div className="p-4 border rounded bg-white mt-2">
+                    <h2 className="text-lg font-bold mb-2">Prediction</h2>
+                    <p>Fire spread simulation placeholder.</p>
+                </div>
+            );
+        }
+
+        function RoleSelector({ role, setRole }) {
+            return (
+                <div className="mb-4">
+                    <label className="mr-2 font-semibold">Role:</label>
+                    <select value={role} onChange={e => setRole(e.target.value)} className="border rounded p-1">
+                        <option value="utility">Utility Operator</option>
+                        <option value="fire">Fire Agency</option>
+                    </select>
+                </div>
+            );
+        }
+
+        function App() {
+            const [role, setRole] = useState('utility');
+            return (
+                <div className="space-y-4">
+                    <RoleSelector role={role} setRole={setRole} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 bg-white rounded">
+                            <AlertsFeed />
+                        </div>
+                        <div className="p-4 bg-white rounded">
+                            <MapPanel />
+                        </div>
+                        <div className="p-4 bg-white rounded">
+                            <ChartPanel />
+                        </div>
+                    </div>
+                    <PredictionPanel />
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
