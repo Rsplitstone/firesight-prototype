@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireSight React Demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; }
+        #root { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        const { useEffect, useRef } = React;
+
+        function Dashboard() {
+            const mapRef = useRef(null);
+            useEffect(() => {
+                const map = L.map(mapRef.current).setView([37.7749, -122.4194], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            }, []);
+
+            useEffect(() => {
+                const ctx = document.getElementById('chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['0', '5', '10', '15'],
+                        datasets: [{
+                            label: 'Prediction',
+                            data: [0, 10, 20, 35],
+                            borderColor: 'red',
+                            fill: false
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }, []);
+
+            const alerts = [
+                'Sensor triggered at 12:05',
+                'Flame detected at 12:10'
+            ];
+
+            return (
+                React.createElement('div', { style: { display: 'flex', height: '100%' } },
+                    React.createElement('div', {
+                        style: { width: '25%', padding: '1rem', borderRight: '1px solid #ccc', overflow: 'auto' }
+                    },
+                        React.createElement('h2', null, 'Live Alerts'),
+                        React.createElement('ul', null,
+                            alerts.map((a, i) => React.createElement('li', { key: i }, a))
+                        )
+                    ),
+                    React.createElement('div', { style: { flexGrow: 1, display: 'flex', flexDirection: 'column' } },
+                        React.createElement('div', { ref: mapRef, style: { flexGrow: 1 } }),
+                        React.createElement('canvas', { id: 'chart', style: { height: '200px' } })
+                    )
+                )
+            );
+        }
+
+        ReactDOM.render(React.createElement(Dashboard), document.getElementById('root'));
+    </script>
+</body>
+</html>
