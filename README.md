@@ -1,6 +1,17 @@
 # FireSight Prototype
 
-This repository contains a simple prototype for the FireSight user interface. It now also includes scripts for generating demo datasets used during development and testing.
+This repository contains a simple prototype for the FireSight user interface with a minimal Python backend demonstrating ingestion, data fusion, basic analytics and alert generation for wildfire monitoring. It also includes scripts for generating demo datasets used during development and testing.
+
+## Running the Demo Backend
+
+1. Ensure Python 3.11 is installed.
+2. From the repository root run:
+
+```bash
+python3 main.py
+```
+
+The script ingests dummy camera, satellite and sensor data from the `data/` directory, performs simple rule-based threat detection and prints generated alerts in JSON format.
 
 ## Demo Data Scripts
 

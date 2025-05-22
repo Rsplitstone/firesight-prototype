@@ -1,0 +1,4 @@
+[
+  {"timestamp": "2023-01-01T00:02:00Z", "lat": 34.05, "lon": -118.25, "temperature": 40, "humidity": 20},
+  {"timestamp": "2023-01-01T00:07:00Z", "lat": 34.05, "lon": -118.25, "temperature": 38, "humidity": 25}
+]
