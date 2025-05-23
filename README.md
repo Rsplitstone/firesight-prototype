@@ -88,9 +88,39 @@ python3 backend/test_satellite_integration.py
 
 For detailed information about satellite data sources, see [Satellite Data Integration Guide](docs/satellite_data_integration.md).
 
+## Quick Deployment
+
+### Using Deployment Scripts (Recommended)
+
+**Windows (PowerShell):**
+```powershell
+.\deploy.ps1
+```
+
+**Linux/macOS (Bash):**
+```bash
+chmod +x deploy.sh && ./deploy.sh
+```
+
+### Manual Docker Deployment
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your NASA API key and configuration
+
+# Build and start services
+docker compose build
+docker compose up -d
+
+# Access the application
+# Frontend: http://localhost:3000
+# API: http://localhost:8000
+```
+
 ## Documentation
 
 - [Architecture Overview](docs/architecture.md) - System design and components
-- [Deployment Guide](docs/deployment.md) - Deployment instructions
+- [Deployment Guide](docs/deployment-guide.md) - Complete deployment instructions
 - [Demo Guide](docs/demo-guide.md) - Running effective demonstrations
 - [Satellite Data Integration](docs/satellite_data_integration.md) - Satellite data sources
