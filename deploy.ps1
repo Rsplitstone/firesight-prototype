@@ -1,24 +1,39 @@
 # FireSight Deployment Script for Windows
 # This script helps deploy the FireSight AI platform on Windows
 
-Write-Host "🔥 FireSight AI Deployment Script" -ForegroundColor Yellow
-Write-Host "==================================" -ForegroundColor Yellow
+Write-Host "FireSight AI Deployment Script" -ForegroundColor Yellow
+Write-Host "===============================" -ForegroundColor Yellow
+
+# Function to check if a command exists
+function Test-Command($cmdname) {
+    try {
+        if (Get-Command $cmdname -ErrorAction Stop) { return $true }
+    }
+    catch { return $false }
+}
 
 # Check if Docker is installed
-try {
-    docker --version | Out-Null
-    Write-Host "✅ Docker is installed" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Docker is not installed. Please install Docker Desktop first." -ForegroundColor Red
+if (Test-Command "docker") {
+    try {
+        $dockerVersion = docker --version
+        Write-Host "[OK] Docker is installed: $dockerVersion" -ForegroundColor Green
+    } catch {
+        Write-Host "[ERROR] Docker command failed" -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "[ERROR] Docker is not installed. Please install Docker Desktop first." -ForegroundColor Red
+    Write-Host "Download from: https://www.docker.com/products/docker-desktop" -ForegroundColor Cyan
     exit 1
 }
 
 # Check if Docker Compose is available
-try {
-    docker compose version | Out-Null
-    Write-Host "✅ Docker Compose is available" -ForegroundColor Green
-} catch {
-    Write-Host "❌ Docker Compose is not available. Please update Docker Desktop." -ForegroundColor Red
+if (Test-Command "docker") {
+    try {
+        docker compose version | Out-Null
+        Write-Host "[OK] Docker Compose is available" -ForegroundColor Green
+    } catch {
+        Write-Host "[ERROR] Docker Compose is not available. Please update Docker Desktop." -ForegroundColor Red
     exit 1
 }
 

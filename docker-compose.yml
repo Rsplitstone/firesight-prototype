@@ -6,9 +6,10 @@ services:
     environment:
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
-      - NASA_API_KEY=${NASA_API_KEY:-}
+      - NASA_API_KEY=${NASA_API_KEY}
     volumes:
       - ./data:/app/data
+      # Ensure this directory exists or create it
       - ./backend/logs:/app/logs
     healthcheck:
       test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
@@ -30,10 +31,10 @@ services:
       - API_HOST=0.0.0.0
       - API_PORT=8000
       - API_DEBUG=false
-      - NASA_API_KEY=${NASA_API_KEY:-}
+      - NASA_API_KEY=${NASA_API_KEY}
     volumes:
-      - ./data:/app/data:ro
-      - ./backend:/app/backend:ro
+      - ./data:/app/data
+      - ./backend:/app/backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -51,8 +52,10 @@ services:
     ports:
       - "3000:80"
     volumes:
-      - ./frontend:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Make sure ./frontend exists and contains index.html
+      - ./frontend:/usr/share/nginx/html
+      # If you have a custom nginx.conf, ensure it exists
+      # - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - api
     healthcheck:
@@ -87,10 +90,3 @@ volumes:
 networks:
   firesight-network:
     driver: bridge
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-networks:
-  default:
-    name: firesight-network
