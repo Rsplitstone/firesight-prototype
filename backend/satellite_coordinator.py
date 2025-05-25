@@ -11,6 +11,17 @@ import json
 from datetime import datetime
 import pandas as pd
 
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # Environment variables must be set manually
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("firesight.satellite.coordinator")
+
 # Import original ingestion modules
 from ingestion import ingest_camera, ingest_satellite, ingest_sensor
 from fusion import fuse_streams

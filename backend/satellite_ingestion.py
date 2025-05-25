@@ -14,9 +14,16 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 
-# Setup logging
+# Setup logging first
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("firesight.satellite")
+
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    logger.warning("python-dotenv not available. Environment variables must be set manually.")
 
 try:
     # Optional dependencies for GeoTIFF/GRIB processing
@@ -38,7 +45,8 @@ class SatelliteDataClient:
     """Base class for satellite data clients"""
     
     def __init__(self, api_key=None, timeout=DEFAULT_TIMEOUT):
-        self.api_key = api_key
+        # Use provided API key or fall back to environment variable
+        self.api_key = api_key or os.getenv('NASA_API_KEY')
         self.timeout = timeout
     
     def _make_request(self, url, params=None, headers=None, method="GET", retries=MAX_RETRIES):

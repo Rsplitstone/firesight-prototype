@@ -10,6 +10,13 @@ import json
 import numpy as np
 from datetime import datetime, timedelta
 
+# Load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # Environment variables must be set manually
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("firesight.satellite.enhancement")
