@@ -1,15 +1,42 @@
 # FireSight Prototype
 
+🚀 **[DEPLOYMENT COMPLETE!](DEPLOYMENT_COMPLETE.md)** - Enhanced with NASA satellite data integration
+
+## 🔥 Quick Start - Live Demo
+
+**Get your live demo running in 2 minutes:**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Rsplitstone/firesight-prototype.git
+cd firesight-prototype
+
+# 2. Deploy live demo (Windows)
+.\deploy-live-demo.ps1
+
+# OR Deploy live demo (Linux/Mac)
+chmod +x deploy-live-demo.sh
+./deploy-live-demo.sh
+```
+
+**Then open:** http://localhost:3000 🎯
+
+---
+
 This repository contains a functional prototype for the FireSight AI platform that demonstrates core wildfire detection and monitoring capabilities. It integrates diverse data sources including camera feeds, satellite imagery, IoT sensors, and weather data, then uses AI analytics to detect and predict fire incidents. The system includes a proper architecture with API endpoints for integration and a web-based dashboard for visualization.
 
 ## Features
 
-- **Multi-source data integration**: Camera feeds, satellite imagery, IoT sensors, weather data
-- **Comprehensive satellite data**: MODIS, VIIRS, GOES, Sentinel, Landsat, and more
-- **AI-powered analytics**: Fire detection, spread prediction, and resource optimization
-- **Real-time monitoring**: Continuous observation with rapid alert generation
-- **Interactive dashboard**: Visualization of fire incidents, predictions, and resources
-- **REST API**: Well-documented endpoints for easy integration with other systems
+- **🎮 Live Interactive Demo**: Complete dashboard with real-time data visualization
+- **🛰️ Enhanced satellite data**: MODIS Collection 6.1, VIIRS I-Band (Suomi NPP & NOAA-20), combined products
+- **🔗 NASA FIRMS API integration**: Real-time access to active fire detection data with configured API key
+- **📡 Comprehensive satellite sources**: MODIS, VIIRS, GOES, Sentinel, Landsat, and more
+- **🤖 AI-powered analytics**: Fire detection, spread prediction, and resource optimization
+- **⚡ Real-time monitoring**: Continuous observation with rapid alert generation
+- **📊 Interactive dashboard**: Visualization of fire incidents, predictions, and resources
+- **🔌 REST API**: Well-documented endpoints for easy integration with other systems
+- **🐳 Docker deployment**: Production-ready containerized services
+- **⚙️ CI/CD pipeline**: Automated testing and deployment workflows
 
 ## Running the Demo Backend
 
@@ -88,6 +115,16 @@ python3 backend/test_satellite_integration.py
 
 For detailed information about satellite data sources, see [Satellite Data Integration Guide](docs/satellite_data_integration.md).
 
+## 🚀 Live Demo Access
+
+After deployment, access these URLs:
+
+- **🌐 Live Dashboard**: http://localhost:3000
+- **🔌 API Endpoint**: http://localhost:8000  
+- **📋 API Documentation**: http://localhost:8000/docs
+- **📊 Demo Status**: http://localhost:8000/demo/status
+- **🛰️ Live Satellite Data**: http://localhost:8000/demo/satellite-data
+
 ## Quick Deployment
 
 ### Using Deployment Scripts (Recommended)
@@ -118,9 +155,11 @@ docker compose up -d
 # API: http://localhost:8000
 ```
 
-## Documentation
+## 📖 Documentation
 
-- [Architecture Overview](docs/architecture.md) - System design and components
-- [Deployment Guide](docs/deployment-guide.md) - Complete deployment instructions
-- [Demo Guide](docs/demo-guide.md) - Running effective demonstrations
-- [Satellite Data Integration](docs/satellite_data_integration.md) - Satellite data sources
+- **[Live Demo Guide](docs/live-demo-guide.md)** - Complete deployment guide
+- **[Demo Guide](docs/demo-guide.md)** - Basic usage instructions
+- **[Deployment Guide](docs/deployment-guide.md)** - Advanced deployment options
+- **[Architecture](docs/architecture.md)** - System architecture details
+
+---
