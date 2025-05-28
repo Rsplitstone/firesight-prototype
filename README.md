@@ -1,4 +1,16 @@
-# FireSight Prototype
+# 🔥 FireSight AI - Live Demo Ready!
+
+> **🎯 [LIVE DEMO DEPLOYMENT GUIDE](LIVE_DEMO_READY.md) - Deploy in 2 minutes!**
+
+**Deploy your live demo now:**
+```powershell
+# Windows (One command deployment)
+.\deploy-live-demo.ps1
+
+# Then open: http://localhost:3000 🚀
+```
+
+---
 
 🚀 **[DEPLOYMENT COMPLETE!](DEPLOYMENT_COMPLETE.md)** - Enhanced with NASA satellite data integration
 
